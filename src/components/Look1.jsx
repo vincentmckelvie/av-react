@@ -29,7 +29,7 @@ const emitter = new ParticleEmitter({max:500, particleClass:Particle});
 
 export const Look1 = ({ fft, scene }) => {
     
-    //const myMesh = useRef();
+    const myMesh = useRef();
     const smooth = useRef(0);
     const particleReset = useRef(false);
     
@@ -44,7 +44,7 @@ export const Look1 = ({ fft, scene }) => {
         //myMesh.current.scale.x = smooth.current;
 
         emitter.obj = {scene:scene.current}; 
-        if(max > 4.1){
+        if(max > 4){
             if(!particleReset.current){
                 particleReset.current = true;
                 const hue = Math.random()*.1;
@@ -69,9 +69,13 @@ export const Look1 = ({ fft, scene }) => {
     return(
     <> 
         <group ref={scene} >
+        
             <hemisphereLight color="white" groundColor="grey" intensity={0.75} />
             <spotLight position={[10 , 10, 2]} angle={2.25} penumbra={1} intensity={100} />
-           
+            <mesh position-x={-1} ref={myMesh}>
+                <boxGeometry args={[1, 1, 1]} />
+                <meshStandardMaterial color="red" />
+            </mesh>
         </group>
         
     </>
@@ -81,10 +85,7 @@ export const Look1 = ({ fft, scene }) => {
 /*
 
 
- <mesh position-x={-1} ref={myMesh}>
-                <boxGeometry args={[1, 1, 1]} />
-                <meshStandardMaterial color="red" />
-            </mesh>
+ 
 
 <Particles count={1000} mouse={mouse} />
 <mesh ref={myMesh} scale={[ 1 , 1, 1]}>

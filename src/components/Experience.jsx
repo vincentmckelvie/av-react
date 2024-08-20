@@ -28,10 +28,10 @@ import {Look1} from "./Look1"
 import {Look2} from "./Look2"
 import {Look3} from "./Look3"
 
-const emitter = new ParticleEmitter({max:500, particleClass:Particle});
-
 export const Experience = ({ fft }) => {
+    
     const [initedScenes, setInitedScenes] = useState(false);
+    
     const info = [
         {
             look: Look1,
@@ -46,22 +46,24 @@ export const Experience = ({ fft }) => {
             scene:useRef()
         },
     ]
-    //const looks = useRef([<Look1 fft={fft}/>, <Look2 fft={fft}/>, <Look2 fft={fft}/> ])
+    
     const transitionTimer = useRef(0);
     const transitionVal = useRef(0);
     const sceneIndex = useRef(1);
     const scene1 = useRef();
     const scene2 = useRef();
     
-    const looksArr = useMemo(() => {
-        const temp = []
-        info.forEach((obj, i) => {
-            temp.push({ render:<obj.look key={i} fft={fft} scene={obj.scene} />, scene:obj.scene, index:i, rendering:(i==0||i==1) ? true : false})
-            //temp.push({ render:<obj.look key={i} fft={fft} scene={obj.scene} />, scene:obj.scene, index:i, rendering:true })
-        });
-        return temp
-    }, [info.length])
+    const temp = [];
+    info.forEach((obj, i) => {
+        //temp.push({ render:<obj.look key={i} fft={fft} scene={obj.scene} />, scene:obj.scene, index:i, rendering:(i==0||i==1) ? true : false})
+        const ob = { render:<obj.look key={i} fft={fft} scene={obj.scene} />, scene:obj.scene, index:i, rendering:true };
+        //setLooks([ ...looks, obj ]);
+        temp.push(ob);
 
+    });
+    const [looksArr, setLooksArr] = useState(temp);
+    
+    
     
     useFrame(( state, delta ) => {
         
@@ -74,10 +76,10 @@ export const Experience = ({ fft }) => {
         if(scene1.current != null && scene2.current != null){
             transitionTimer.current += delta;  
             //after 10 seconds transition
-            if( transitionTimer.current > 10 ){
+            if( transitionTimer.current > 2 ){
                 transitionTimer.current = 0;
                 const toVal = transitionVal.current == 0 ? 1 : 0;
-                gsap.to(transitionVal, { current: toVal, duration: .4, onComplete:function(){ 
+                gsap.to(transitionVal, { current: toVal, duration: .5, onComplete:function(){ 
                     
                     sceneIndex.current += 1;
                     sceneIndex.current = sceneIndex.current % looksArr.length;
@@ -86,27 +88,63 @@ export const Experience = ({ fft }) => {
                     if(transitionVal.current == 1){
                         scene1.current = looksArr[sceneIndex.current].scene.current;
                     }else{
-                        scene2.current = looksArr[sceneIndex.current].scene.current;
-                        //scene2.current = allScenes.current[sceneIndex.current].current; 
+                        scene2.current = looksArr[sceneIndex.current].scene.current; 
                     }
 
-                    looksArr.forEach((obj, i)=> {
-                        const shouldRender = obj.scene.current == scene1.current || obj.scene.current == scene2.current;
-                        //    if()
-                        looksArr[i].rendering = shouldRender;// = {render:obj.render, scene:obj.scene, index:i, rendering:shouldRender}
-                        //console.log("should render const = "+shouldRender);
-                        //console.log("arr value = "+looksArr[i].rendering);
-                    });
-
-                
                 }});
             
             }
         }
-        
-          
+       
 
-            /*
+        looksArr.map(obj=>{
+            const shouldRender = obj.scene.current == scene1.current || obj.scene.current == scene2.current;
+            return{
+                ...obj,
+                rendering:shouldRender
+            }
+        });
+
+           
+    })
+
+    useEffect(() => {
+        setInitedScenes(true);
+    }, [scene1.current, scene2.current]);
+
+    function Post() {
+        //if (scene1.current != null && scene2.current != null) {
+        if(initedScenes){
+            return <CustomEffects scene1={scene2} scene2={scene1} transitionValue={transitionVal} />;
+        }
+        return;
+    }
+
+    
+    return(
+    <>
+        {Post()}
+        
+        <OrbitControls autoRotate={true}/>
+
+        {looksArr.map(item => {
+            if(item.rendering)
+                return item.render
+        })}
+      
+    </>
+    )
+}
+
+  // looksArr.forEach((obj, i)=> {
+        //     const shouldRender = obj.scene.current == scene1.current || obj.scene.current == scene2.current;
+        //     looksArr[i].rendering = shouldRender;// = {render:obj.render, scene:obj.scene, index:i, rendering:shouldRender}
+        //     //console.log("should render const = "+shouldRender);
+        //     //console.log("arr value = "+looksArr[i].rendering);
+        // });
+        
+
+ /*
          
 
         // const audioVal = ( 90 + (fft.getValue()[20]) ) * .1 ;
@@ -135,39 +173,6 @@ export const Experience = ({ fft }) => {
         
         //console.log(a) // the value will be 0 at scene initialization and grow each frame
         //console.log(tone)
-    })
-
-    useEffect(() => {
-        setInitedScenes(true);
-    }, [scene1.current, scene2.current]);
-
-    function Post() {
-        //if (scene1.current != null && scene2.current != null) {
-        if(initedScenes){
-            return <CustomEffects scene1={scene2} scene2={scene1} transitionValue={transitionVal} />;
-        }
-        return;
-    }
-
-    
-    return(
-    <>
-        {Post()}
-        
-        <OrbitControls autoRotate={true}/>
-
-        {looksArr.map(item => {
-            //if(item.rendering)
-                return item.render
-            //return;
-        })}
-      
-        
-        
-        
-    </>
-    )
-}
 
 /*
 
