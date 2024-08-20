@@ -1,35 +1,75 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
 import './App.css'
+import React, { useState, useRef, useEffect, useMemo } from "react";
+
+import { Canvas } from "@react-three/fiber" 
+import { Experience } from './components/Experience'
+
+import * as Tone from 'tone';
+
+const  FFT = new Tone.FFT()
+FFT.smoothing = .8;
+//navigator.requestMIDIAccess().then(requestMIDIAccessSuccess);
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [input, setInput] = useState(null)
+  const [synth, setSynth] = useState(null)
 
-  return (
+  useEffect(() => {
+    // Initialize Tone.js components
+    const newSynth = new Tone.Synth().toDestination()
+    newSynth.volume.value = -100;
+    setSynth(newSynth)
+
+    return () => {
+      // Clean up Tone.js components
+      newSynth.dispose()
+    }
+  }, [])
+
+  useEffect(() => {
+    // Initialize Tone.js components
+    const newInput = new Tone.UserMedia().toDestination()
+    setInput(newInput)
+    
+    return () => {
+      // Clean up Tone.js components
+      //newInput.dispose()
+    }
+  }, [])
+
+  const handlePlay = () => {
+    setIsPlaying(true);
+    synth.triggerAttackRelease('C4', '8n')
+    input.open();  
+    input.connect(FFT);
+  }
+ 
+
+  return (  
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    {!isPlaying ?
+      <div className='init-holder'>
+        <button className='init-center' onClick={handlePlay} >
+          Initiate
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      :
+      <div className='kill-holder'></div>
+    }
+    <Canvas >
+      <color attach="background" args={["#101010"]} />
+      <Experience fft = {FFT}/>
+    </Canvas>
     </>
   )
 }
 
 export default App
+
+/*
+ <button onClick={openInput}>
+        Open Input
+    </button>
+*/
