@@ -74,7 +74,7 @@ export const Experience = ({ fft }) => {
         if(scene1.current != null && scene2.current != null){
             transitionTimer.current += delta;  
             //after 10 seconds transition
-            if( transitionTimer.current > 2 ){
+            if( transitionTimer.current > 10 ){
                 transitionTimer.current = 0;
                 const toVal = transitionVal.current == 0 ? 1 : 0;
                 gsap.to(transitionVal, { current: toVal, duration: .4, onComplete:function(){ 
