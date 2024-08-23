@@ -70,29 +70,12 @@ export const Experience = ({ fft }) => {
         }
        
 
-    //     looksArr.map(obj=>{
-    //         const shouldRender = obj.scene.current == scene1.current || obj.scene.current == scene2.current;
-    //         return{
-    //             ...obj,
-    //             rendering:shouldRender
-    //         }
-    //     });
-
-           
     })
 
     useEffect(() => {
         setInitedScenes(true);
     }, [scene1.current, scene2.current]);
     
-    // useEffect(() => {
-    //     setCurr1(looksArr[lk1.current]);
-    // }, [lk1.current]);
-    
-    // useEffect(() => {
-    //     setCurr2(looksArr[lk2.current]);
-    // }, [lk2.current]);
-
     function Post() {
         //if (scene1.current != null && scene2.current != null) {
         if(initedScenes){
@@ -108,8 +91,8 @@ export const Experience = ({ fft }) => {
         
         <OrbitControls autoRotate={true}/>
 
-       <LookHolder Look={looksArr[curr1]} fft={fft} scene={scene1} key={0} />
-       <LookHolder Look={looksArr[curr2]} fft={fft} scene={scene2} key={1} />
+        <LookHolder Look={looksArr[curr1]} fft={fft} scene={scene1} key={0} />
+        <LookHolder Look={looksArr[curr2]} fft={fft} scene={scene2} key={1} />
       
     </>
     )
