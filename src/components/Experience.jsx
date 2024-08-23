@@ -27,25 +27,16 @@ gsap.registerPlugin(useGSAP);
 import {Look1} from "./Look1"
 import {Look2} from "./Look2"
 import {Look3} from "./Look3"
+import {LookHolder} from "./LookHolder"
+
 
 export const Experience = ({ fft }) => {
     
     const [initedScenes, setInitedScenes] = useState(false);
+    const [curr1, setCurr1] = useState(0);
+    const [curr2, setCurr2] = useState(1);
     
-    const info = [
-        {
-            look: Look1,
-            scene:useRef()
-        },
-        {
-            look: Look2,
-            scene:useRef()
-        },
-        {
-            look: Look3,
-            scene:useRef()
-        },
-    ]
+    const looksArr = [Look1,Look2,Look3];
     
     const transitionTimer = useRef(0);
     const transitionVal = useRef(0);
@@ -53,26 +44,9 @@ export const Experience = ({ fft }) => {
     const scene1 = useRef();
     const scene2 = useRef();
     
-    const temp = [];
-    info.forEach((obj, i) => {
-        //temp.push({ render:<obj.look key={i} fft={fft} scene={obj.scene} />, scene:obj.scene, index:i, rendering:(i==0||i==1) ? true : false})
-        const ob = { render:<obj.look key={i} fft={fft} scene={obj.scene} />, scene:obj.scene, index:i, rendering:true };
-        //setLooks([ ...looks, obj ]);
-        temp.push(ob);
 
-    });
-    const [looksArr, setLooksArr] = useState(temp);
-    
-    
-    
     useFrame(( state, delta ) => {
         
-        if(scene1.current == null){
-            scene1.current = looksArr[0].scene.current;
-        }
-        if(scene2.current == null){
-            scene2.current = looksArr[1].scene.current;
-        }
         if(scene1.current != null && scene2.current != null){
             transitionTimer.current += delta;  
             //after 10 seconds transition
@@ -83,27 +57,26 @@ export const Experience = ({ fft }) => {
                     
                     sceneIndex.current += 1;
                     sceneIndex.current = sceneIndex.current % looksArr.length;
-                    console.log(sceneIndex.current);
                     
                     if(transitionVal.current == 1){
-                        scene1.current = looksArr[sceneIndex.current].scene.current;
+                        setCurr1(sceneIndex.current);
                     }else{
-                        scene2.current = looksArr[sceneIndex.current].scene.current; 
+                        setCurr2(sceneIndex.current); 
                     }
-
+                    
                 }});
             
             }
         }
        
 
-        looksArr.map(obj=>{
-            const shouldRender = obj.scene.current == scene1.current || obj.scene.current == scene2.current;
-            return{
-                ...obj,
-                rendering:shouldRender
-            }
-        });
+    //     looksArr.map(obj=>{
+    //         const shouldRender = obj.scene.current == scene1.current || obj.scene.current == scene2.current;
+    //         return{
+    //             ...obj,
+    //             rendering:shouldRender
+    //         }
+    //     });
 
            
     })
@@ -111,6 +84,14 @@ export const Experience = ({ fft }) => {
     useEffect(() => {
         setInitedScenes(true);
     }, [scene1.current, scene2.current]);
+    
+    // useEffect(() => {
+    //     setCurr1(looksArr[lk1.current]);
+    // }, [lk1.current]);
+    
+    // useEffect(() => {
+    //     setCurr2(looksArr[lk2.current]);
+    // }, [lk2.current]);
 
     function Post() {
         //if (scene1.current != null && scene2.current != null) {
@@ -127,103 +108,9 @@ export const Experience = ({ fft }) => {
         
         <OrbitControls autoRotate={true}/>
 
-        {looksArr.map(item => {
-            if(item.rendering)
-                return item.render
-        })}
+       <LookHolder Look={looksArr[curr1]} fft={fft} scene={scene1} key={0} />
+       <LookHolder Look={looksArr[curr2]} fft={fft} scene={scene2} key={1} />
       
     </>
     )
 }
-
-  // looksArr.forEach((obj, i)=> {
-        //     const shouldRender = obj.scene.current == scene1.current || obj.scene.current == scene2.current;
-        //     looksArr[i].rendering = shouldRender;// = {render:obj.render, scene:obj.scene, index:i, rendering:shouldRender}
-        //     //console.log("should render const = "+shouldRender);
-        //     //console.log("arr value = "+looksArr[i].rendering);
-        // });
-        
-
- /*
-         
-
-        // const audioVal = ( 90 + (fft.getValue()[20]) ) * .1 ;
-        // const max = audioVal < .2 ? .2 : audioVal;
-        
-        //smooth+=(max-smooth)*.05;
-       // myMesh.current.scale.x = max;
-
-
-       /*
-        emitter.obj = {scene:scene, TWEEN:TWEEN}; 
-        //console.log(max)
-        if(max>3.5){
-
-            const hue = .2+Math.random()*.3;
-            const amt = 10+Math.floor(Math.random()*20);
-            for(let i = 0; i<amt; i++){
-                emitter.emit({hue:hue});
-            }
-        }else{
-
-        }
-        
-        emitter.update({delta:clock.getDelta()})
-        */
-        
-        //console.log(a) // the value will be 0 at scene initialization and grow each frame
-        //console.log(tone)
-
-/*
-
-
-  <group ref={scene1}>
-            <hemisphereLight color="white" groundColor="grey" intensity={0.75} />
-            <spotLight position={[10 , 10, 2]} angle={2.25} penumbra={1} intensity={100} />
-            <mesh position-x={1}>
-                <sphereGeometry args={[1, 32, 32]} />
-                <meshStandardMaterial color="red" />
-            </mesh>
-            
-        </group>
-        <group ref={scene2}>
-            <hemisphereLight color="white" groundColor="grey" intensity={0.75} />
-            <spotLight position={[10 , 10, 2]} angle={2.25} penumbra={1} intensity={100} />
-            <mesh position-x={-1}>
-                <boxGeometry args={[1, 1, 1]} />
-                <meshStandardMaterial color="red" />
-            </mesh>
-        </group>
-        
-
-
-
-
-
-<Particles count={1000} mouse={mouse} />
-<mesh ref={myMesh} scale={[ 1 , 1, 1]}>
-            <boxGeometry/>
-            <meshStandardMaterial />
-        </mesh>
-
- <Particles count={10000} mouse={mouse} />
-
-        
-
-<!--<Sparks count={20} mouse={mouse} colors={['#A2CCB6', '#FCEEB5', '#EE786E', '#e0feff', 'lightpink', 'lightblue']} />
-        
- <EffectComposer>
-          
-          <TestEffect amplitude={.2} frequency={.1} />
-           
-        </EffectComposer>
-
-<Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
-<Noise opacity={0.2} />
-<Pixelation granularity={20}/>
-
-<TestEffect param={.5} />
-<Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
-<Noise opacity={0.2} />
-<Vignette eskil={false} offset={0.1} darkness={1.1} />
-*/

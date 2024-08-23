@@ -72,11 +72,9 @@ export const Look2 = ({ fft, scene }) => {
 
     return(
     <> 
-        <group ref={scene} >
             <hemisphereLight color="white" groundColor="grey" intensity={0.75} />
             <spotLight position={[10 , 10, 2]} angle={2.25} penumbra={1} intensity={100} />
             <AVLines count={100} fft={fft}/>
-        </group>
         
     </>
     )
